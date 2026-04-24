@@ -34,9 +34,7 @@ jobs:
           
     - name: Get GTA:SA structures file (private)...
       run: |
-        git clone ssh://git@github.com/RusJJ/GTASAAndroid_Structs.git ./structs
-        mv ./structs/* ./
-
+       https://github.com/RusJJ/GTASAAndroid_Structs.git
     - name: Install Android NDK (r25c)...
       uses: nttld/setup-ndk@v1.2.0
       with:
