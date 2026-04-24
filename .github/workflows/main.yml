@@ -3,41 +3,52 @@ name: AML Mod Compiler
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Current Repo
+
+      - name: Checkout repository...
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
-      - name: Get AML Template
+      - name: Download AndroidModLoader's mod template...
+        uses: wei/wget@v1
+        with:
+          args: -O ./AML_src.zip https://github.com/RusJJ/AndroidModLoader/archive/refs/heads/main.zip
+
+      - name: Install AndroidModLoader's mod template...
         run: |
-          wget -O AML_src.zip https://github.com/RusJJ/AndroidModLoader/archive/refs/heads/main.zip
-          unzip AML_src.zip
-          mv AndroidModLoader-main/mod ./mod
+          unzip ./AML_src.zip
+          mv ./AndroidModLoader-main/mod ./mod
 
-      - name: Get SAUtils (Public)
-        run: |
-          git clone https://github.com/RusJJ/SAUtils.git ./mod/SAUtils
+      - name: Get SAUtils...
+        uses: actions/checkout@v4
+        with:
+          repository: RusJJ/SAUtils
+          path: ./mod/SAUtils
 
-      - name: Get Structs (Public)
+      - name: Get GTA:SA structures file...
         run: |
           git clone https://github.com/RusJJ/GTASAAndroid_Structs.git ./structs
 
-      - name: Install NDK
+      - name: Install Android NDK (r25c)...
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r25c
 
-      - name: Build Mod
+      - name: Build the code...
         run: |
           ndk-build -j$(nproc)
 
-      - name: Upload Finished Mod
+      - name: Upload the mod!
         uses: actions/upload-artifact@v4
         with:
-          name: SkyGfx-Android-32bit
-          path: libs/
+          name: SkyGfxMobile-32bit
+          path: ./libs/
           
