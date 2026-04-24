@@ -9,42 +9,39 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Current Repo
+      - name: 1. Checkout Current Repo
         uses: actions/checkout@v4
-        with:
-          submodules: false
 
-      - name: Clean Old Files
+      - name: 2. Setup AML Template
         run: |
-          rm -rf mod structs
-          mkdir -p mod structs
-
-      - name: Get AML Template
-        run: |
-          wget -q -O AML_src.zip https://github.com/RusJJ/AndroidModLoader/archive/refs/heads/main.zip
+          wget -q https://github.com/RusJJ/AndroidModLoader/archive/refs/heads/main.zip -O AML_src.zip
           unzip -q AML_src.zip
-          cp -r AndroidModLoader-main/mod/* ./mod/
+          rm -rf mod
+          mv AndroidModLoader-main/mod ./mod
           rm -rf AndroidModLoader-main AML_src.zip
 
-      - name: Get SAUtils (Public)
-        run: |
-          git clone --depth 1 https://github.com/RusJJ/SAUtils.git ./mod/SAUtils
+      - name: 3. Get SAUtils (Safe Method)
+        uses: actions/checkout@v4
+        with:
+          repository: RusJJ/SAUtils
+          path: mod/SAUtils
 
-      - name: Get Structs (Public)
-        run: |
-          git config --global http.postBuffer 524288000
-          git clone --depth 1 https://github.com/RusJJ/GTASAAndroid_Structs.git ./structs
+      - name: 4. Get Structs (Safe Method)
+        uses: actions/checkout@v4
+        with:
+          repository: RusJJ/GTASAAndroid_Structs
+          path: structs
 
-      - name: Install NDK
+      - name: 5. Install NDK
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r25c
 
-      - name: Build Mod
+      - name: 6. Build Mod
         run: |
           ndk-build NDK_PROJECT_PATH=. -j$(nproc)
 
-      - name: Upload Finished Mod
+      - name: 7. Upload Finished Mod
         uses: actions/upload-artifact@v4
         with:
           name: SkyGfx-Android-32bit
