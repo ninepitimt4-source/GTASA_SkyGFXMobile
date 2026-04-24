@@ -12,36 +12,43 @@ jobs:
       - name: 1. Checkout Current Repo
         uses: actions/checkout@v4
 
-      - name: 2. Setup AML Template
+      - name: 2. Force Clean Everything
+        run: |
+          # ลบโฟลเดอร์เจ้าปัญหาทิ้งให้หมดแบบถอนรากถอนโคน
+          rm -rf structs
+          rm -rf mod
+          rm -rf libs
+          rm -rf obj
+
+      - name: 3. Setup AML Template
         run: |
           wget -q https://github.com/RusJJ/AndroidModLoader/archive/refs/heads/main.zip -O AML_src.zip
           unzip -q AML_src.zip
-          rm -rf mod
           mv AndroidModLoader-main/mod ./mod
           rm -rf AndroidModLoader-main AML_src.zip
 
-      - name: 3. Get SAUtils (Safe Method)
+      - name: 4. Get SAUtils
         uses: actions/checkout@v4
         with:
           repository: RusJJ/SAUtils
           path: mod/SAUtils
 
-      - name: 4. Get Structs (Safe Method)
+      - name: 5. Get Structs
         uses: actions/checkout@v4
         with:
           repository: RusJJ/GTASAAndroid_Structs
           path: structs
 
-      - name: 5. Install NDK
+      - name: 6. Install NDK
         uses: nttld/setup-ndk@v1
         with:
           ndk-version: r25c
 
-      - name: 6. Build Mod
+      - name: 7. Build Mod
         run: |
           ndk-build NDK_PROJECT_PATH=. -j$(nproc)
 
-      - name: 7. Upload Finished Mod
+      - name: 8. Upload Finished Mod
         uses: actions/upload-artifact@v4
         with:
           name: SkyGfx-Android-32bit
